@@ -74,11 +74,17 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
         fps = render.fps / render.fps_base
         fps_conv = fps / 1000
 
-        sequence = bpy.data.scenes[0].sequence_editor
-        top_channel = 0
-        for i in range(len(sequence.sequences_all)):
-            if top_channel < sequence.sequences_all[i].channel:
-                top_channel = sequence.sequences_all[i].channel
+        editor = bpy.data.scenes[0].sequence_editor
+        sequences = bpy.context.sequences
+        if not sequences:
+            addSceneChannel = 1
+        else:
+            channels = [s.channel for s in sequences]
+            channels = sorted(list(set(channels)))
+            empty_channel = channels[-1] + 1
+            addSceneChannel = empty_channel                
+                
+                
         file = self.filepath
         if not file:
             return {"CANCELLED"}
@@ -129,10 +135,10 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
                 position = True
                 line.text = re.sub(r'{.+?}', '', line.text)
                 
-            new_strip = sequence.sequences.new_effect(
+            new_strip = editor.sequences.new_effect(
                 line.text,
                 "TEXT",
-                top_channel,
+                addSceneChannel,
                 frame_start=int(line.start * fps_conv),
                 frame_end=int(line.end * fps_conv),
             )
