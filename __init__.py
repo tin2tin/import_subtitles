@@ -61,10 +61,10 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
     bl_label = "Import Subtitles"
     bl_options = {"REGISTER", "UNDO"}
 
-    filename_ext = [".srt",".ass"]
+    filename_ext = [".srt", ".ass"]
 
     filter_glob: StringProperty(
-        default='*.srt;*.ass;*.ssa;*.mpl2;*.tmp;*.vtt;*.microdvd',
+        default="*.srt;*.ass;*.ssa;*.mpl2;*.tmp;*.vtt;*.microdvd",
         options={"HIDDEN"},
         maxlen=255,
     )
@@ -82,9 +82,7 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             channels = [s.channel for s in sequences]
             channels = sorted(list(set(channels)))
             empty_channel = channels[-1] + 1
-            addSceneChannel = empty_channel                
-                
-                
+            addSceneChannel = empty_channel
         file = self.filepath
         if not file:
             return {"CANCELLED"}
@@ -94,17 +92,17 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
                 not in pysubs2.formats.FILE_EXTENSION_TO_FORMAT_IDENTIFIER
             ):
                 print("Unable to extract subtitles from file")
-                self.report({'INFO'}, "Unable to extract subtitles from file")
+                self.report({"INFO"}, "Unable to extract subtitles from file")
                 return {"CANCELLED"}
         try:
             subs = pysubs2.load(self.filepath, fps=fps, encoding="utf-8")
         except:
             print("Import failed. Text encoding must be in UTF-8.")
-            self.report({'INFO'}, "Import failed. Text encoding must be in UTF-8.")
+            self.report({"INFO"}, "Import failed. Text encoding must be in UTF-8.")
             return {"CANCELLED"}
         if not subs:
             print("No file imported.")
-            self.report({'INFO'}, "No file imported")
+            self.report({"INFO"}, "No file imported")
             return {"CANCELLED"}
         for line in subs:
             italics = False
@@ -125,16 +123,15 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
                 line.text = line.text.replace("{\\b0}", "")
                 line.text = line.text.replace("{\\b1}", "")
             if r"{" in line.text:
-                pos_trim = re.search(r'\{\\pos\((.+?)\)\}', line.text)
+                pos_trim = re.search(r"\{\\pos\((.+?)\)\}", line.text)
                 print(pos_trim)
                 pos_trim = pos_trim.group(1)
                 print(pos_trim)
                 pos = pos_trim.split(",")
-                x = int(pos[0])/render.resolution_x
-                y = (render.resolution_y-int(pos[1]))/render.resolution_y
+                x = int(pos[0]) / render.resolution_x
+                y = (render.resolution_y - int(pos[1])) / render.resolution_y
                 position = True
-                line.text = re.sub(r'{.+?}', '', line.text)
-                
+                line.text = re.sub(r"{.+?}", "", line.text)
             new_strip = editor.sequences.new_effect(
                 line.text,
                 "TEXT",
@@ -146,18 +143,55 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             new_strip.wrap_width = 0.68
             new_strip.font_size = 48
             new_strip.location[1] = 0.2
-            new_strip.align_x = 'CENTER'
+            new_strip.align_x = "CENTER"
             new_strip.align_y = "TOP"
             new_strip.use_shadow = True
             new_strip.use_box = True
             if position:
                 new_strip.location[0] = x
                 new_strip.location[1] = y
-                new_strip.align_x = 'LEFT'
+                new_strip.align_x = "LEFT"
             if italics:
                 new_strip.use_italic = True
             if bold:
                 new_strip.use_bold = True
+        return {"FINISHED"}
+
+
+class SEQUENCER_OT_copy_textprops_to_selected(Operator):
+    """Copy properties from active text strip to selected text strips"""
+
+    bl_idname = "sequencer.copy_textprops_to_selected"
+    bl_label = "Copy Properties to Selected"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        current_scene = bpy.context.scene
+        try:
+            active = current_scene.sequence_editor.active_strip
+        except AttributeError:
+            self.report({"INFO"}, "No active strip selected")
+            return {"CANCELLED"}
+        for strip in context.selected_sequences:
+            if strip.type == active.type == "TEXT":
+                strip.wrap_width = active.wrap_width
+
+                strip.font = active.font
+                strip.use_italic = active.use_italic
+                strip.use_bold = active.use_bold
+                strip.font_size = active.font_size
+                strip.color = active.color
+
+                strip.use_shadow = active.use_shadow
+                strip.shadow_color = active.shadow_color
+                strip.use_box = active.use_box
+                strip.box_color = active.box_color
+                strip.box_margin = active.box_margin
+
+                strip.location[0] = active.location[0]
+                strip.location[1] = active.location[1]
+                strip.align_x = active.align_x
+                strip.align_y = active.align_y
         return {"FINISHED"}
 
 
@@ -167,16 +201,29 @@ def import_subtitles(self, context):
     layout.operator("sequencer.import_subtitles", icon="IMPORT")
 
 
-classes = (SEQUENCER_OT_import_subtitles,)
+def copyto_panel_append(self, context):
+    strip = context.active_sequence_strip
+    strip_type = strip.type
+    if strip_type == "TEXT":
+        layout = self.layout
+        layout.operator(SEQUENCER_OT_copy_textprops_to_selected.bl_idname)
+
+
+classes = (
+    SEQUENCER_OT_import_subtitles,
+    SEQUENCER_OT_copy_textprops_to_selected,
+)
 
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.types.SEQUENCER_MT_strip.append(import_subtitles)
+    bpy.types.SEQUENCER_PT_effect.append(copyto_panel_append)
 
 
 def unregister():
+    bpy.types.SEQUENCER_PT_effect.remove(copyto_panel_append)
     for cls in classes:
         bpy.utils.unregister_class(cls)
     bpy.types.SEQUENCER_MT_strip.remove(import_subtitles)
