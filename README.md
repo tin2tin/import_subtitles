@@ -1,5 +1,5 @@
 # Import Subtitles
-Add-on for importing subtitles(srt, ssa, ass, mpl2, tmp, vtt, microdvd) in the Blender Video Sequence Editor uning pysubs2 module, and add 'Copy Text Properties to Selected' - operator. 
+Add-on for importing subtitles(srt, ssa, ass, mpl2, tmp, vtt, microdvd) in the Blender Video Sequence Editor using pysubs2 module, and add 'Copy Text Properties to Selected' - operator. 
 
 ## Installation
 On windows right click on the Blender icon and start it by selecting "Run as Administrator"(or else can't the pysubs2 be installed).
