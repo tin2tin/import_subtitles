@@ -8,9 +8,11 @@ And then install as any other Blender add-on.
 
 ## Usage
 Import:
+
 ![alt text](https://pasteall.org/media/6/7/677b994d8bbc75a475d86db7697afb0f.gif)
 
 Copy to Selected:
+
 ![alt text](https://pasteall.org/media/5/b/5bf0e161c8ab065111a9e9615ee376c7.gif)
 
 ## Supported Formats
