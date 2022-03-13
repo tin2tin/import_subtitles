@@ -21,7 +21,6 @@ bl_info = {
 
 try:
     import pysubs2
-
     print("Installed: pysubs2")
 except ImportError:
     print("Installing pysubs2...")
@@ -160,7 +159,6 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
 
 class SEQUENCER_OT_copy_textprops_to_selected(Operator):
     """Copy properties from active text strip to selected text strips"""
-
     bl_idname = "sequencer.copy_textprops_to_selected"
     bl_label = "Copy Properties to Selected"
     bl_options = {"REGISTER", "UNDO"}
@@ -175,19 +173,16 @@ class SEQUENCER_OT_copy_textprops_to_selected(Operator):
         for strip in context.selected_sequences:
             if strip.type == active.type == "TEXT":
                 strip.wrap_width = active.wrap_width
-
                 strip.font = active.font
                 strip.use_italic = active.use_italic
                 strip.use_bold = active.use_bold
                 strip.font_size = active.font_size
                 strip.color = active.color
-
                 strip.use_shadow = active.use_shadow
                 strip.shadow_color = active.shadow_color
                 strip.use_box = active.use_box
                 strip.box_color = active.box_color
                 strip.box_margin = active.box_margin
-
                 strip.location[0] = active.location[0]
                 strip.location[1] = active.location[1]
                 strip.align_x = active.align_x
