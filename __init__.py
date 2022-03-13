@@ -13,7 +13,7 @@ bl_info = {
     "version": (0, 1, 0),
     "blender": (2, 92, 0),
     "description": "Import subtitles",
-    "location": "Sequence Editor > Sidebar > Subtitle Tab",
+    "location": "Sequence Editor > Strip Menu > Import Subtitles",
     "warning": "",
     "tracker_url": "",
     "category": "Sequencer",
