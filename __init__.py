@@ -6,8 +6,6 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 import pathlib
 import re
-import subprocess
-import site
 
 bl_info = {
     "name": "Subtitle Import",
@@ -20,24 +18,6 @@ bl_info = {
     "tracker_url": "",
     "category": "Sequencer",
 }
-
-app_path = site.USER_SITE
-if app_path not in sys.path:
-    sys.path.append(app_path)
-pybin = sys.executable  # bpy.app.binary_path_python # Use for 2.83
-
-try:
-    subprocess.call([pybin, "-m", "ensurepip"])
-except ImportError:
-    pass
-try:
-    import pysubs2
-except ImportError:
-    subprocess.check_call([pybin, "-m", "pip", "install", "pysubs2"])
-try:
-    import pysubs2
-except ImportError:
-    print("Installation of the pysubs2 module failed. Try to run Blender as administrator.")
     
 
 class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
@@ -56,6 +36,33 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
     )
 
     def execute(self, context):
+        
+        try:
+            import pysubs2
+        except ModuleNotFoundError:
+            import site
+            import subprocess
+            import sys
+            app_path = site.USER_SITE
+            if app_path not in sys.path:
+                sys.path.append(app_path)
+            pybin = sys.executable  # bpy.app.binary_path_python # Use for 2.83
+
+            print("Ensuring: pip")
+            try:
+                subprocess.call([pybin, "-m", "ensurepip"])
+            except ImportError:
+                pass
+            self.report({'INFO'}, "Installing: pysubs2 module.")
+            print("Installing: pysubs2 module")
+            subprocess.check_call([pybin, "-m", "pip", "install", "pysubs2"])
+            try:
+                import pysubs2
+            except ModuleNotFoundError:
+                print("Installation of the pysubs2 module failed")
+                self.report({'INFO'}, "Installing pysubs2 module failed! Try to run Blender as administrator.")
+                return {"CANCELLED"}
+        
         render = bpy.context.scene.render
         fps = render.fps / render.fps_base
         fps_conv = fps / 1000
