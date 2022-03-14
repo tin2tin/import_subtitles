@@ -6,12 +6,14 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 import pathlib
 import re
+import subprocess
+import site
 
 bl_info = {
     "name": "Subtitle Import",
     "author": "tintwotin",
     "version": (0, 1, 0),
-    "blender": (2, 92, 0),
+    "blender": (3, 0, 0),
     "description": "Import subtitles",
     "location": "Sequence Editor > Strip Menu > Import Subtitles",
     "warning": "",
@@ -19,39 +21,24 @@ bl_info = {
     "category": "Sequencer",
 }
 
+app_path = site.USER_SITE
+if app_path not in sys.path:
+    sys.path.append(app_path)
+pybin = sys.executable  # bpy.app.binary_path_python # Use for 2.83
+
+try:
+    subprocess.call([pybin, "-m", "ensurepip"])
+except ImportError:
+    pass
 try:
     import pysubs2
-    print("Installed: pysubs2")
 except ImportError:
-    print("Installing pysubs2...")
-    import subprocess
-    import bpy
-    import os
-    from pathlib import Path
-
-    if bpy.app.version < (2, 92, 0):
-        py_exec = bpy.app.binary_path_python
-        subprocess.call([str(py_exec), "-m", "ensurepip", "--user"])
-        subprocess.call([str(py_exec), "-m", "pip", "install", "--upgrade", "pip"])
-        subprocess.call([str(py_exec), "-m", "pip", "install", "--user", "pysubs2"])
-    else:
-        import sys
-
-        py_exec = str(sys.executable)
-        lib = os.path.join(Path(py_exec).parent.parent, "lib")
-        subprocess.call([py_exec, "-m", "ensurepip", "--user"])
-        subprocess.call([py_exec, "-m", "pip", "install", "--upgrade", "pip"])
-        subprocess.call(
-            [py_exec, "-m", "pip", "install", f"--target={str(lib)}", "pysubs2"]
-        )
-        import pysubs2
-except PermissionError:
-    print(
-        "To install, restart Blender by right clicking the Blender icon and select Run as Administrator"
-    )
-except:
-    print("Error installing pysubs2")
-
+    subprocess.check_call([pybin, "-m", "pip", "install", "pysubs2"])
+try:
+    import pysubs2
+except ImportError:
+    print("Installation of the pysubs2 module failed. Try to run Blender as administrator.")
+    
 
 class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
     """Import subtitles"""
