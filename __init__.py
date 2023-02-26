@@ -8,17 +8,17 @@ import pathlib
 import re
 
 bl_info = {
-    "name": "Subtitle Import",
+    "name": "Subtitle Import and Translation",
     "author": "tintwotin",
-    "version": (0, 1, 0),
+    "version": (0, 2, 0),
     "blender": (3, 0, 0),
-    "description": "Import subtitles",
+    "description": "Import and translate subtitles",
     "location": "Sequence Editor > Strip Menu > Import Subtitles",
     "warning": "",
     "tracker_url": "",
     "category": "Sequencer",
 }
-    
+
 
 class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
     """Import subtitles"""
@@ -35,14 +35,157 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
         maxlen=255,
     )
 
+    do_translate: BoolProperty(
+        name="Translate Subtitle", description="Translate subtitle", default=False
+    )
+
+    translate_from: EnumProperty(
+        name="From",
+        description="Translate from",
+        items=(
+            ("auto", "Any language (detect)", ""),
+            ("bg", "Bulgarian", ""),
+            ("zh", "Chinese", ""),
+            ("cs", "Czech", ""),
+            ("da", "Danish", ""),
+            ("nl", "Dutch", ""),
+            ("en", "English", ""),  # Only usable for source language
+            # ("en-US", "English (American)", ""),  # Only usable for destination language
+            # ("en-GB", "English (British)", ""),  # Only usable for destination language
+            ("et", "Estonian", ""),
+            ("fi", "Finnish", ""),
+            ("fr", "French", ""),
+            ("de", "German", ""),
+            ("el", "Greek", ""),
+            ("hu", "Hungarian", ""),
+            ("id", "Indonesian", ""),
+            ("it", "Italian", ""),
+            ("ja", "Japanese", ""),
+            ("lv", "Latvian", ""),
+            ("lt", "Lithuanian", ""),
+            ("pl", "Polish", ""),
+            ("pt", "Portuguese", ""),  # Only usable for source language
+            # ("pt-PT", "Portuguese", ""),  # Only usable for destination language
+            # ("pt-BR", "Portuguese (Brazilian)", ""),  # Only usable for destination language
+            ("ro", "Romanian", ""),
+            ("ru", "Russian", ""),
+            ("sk", "Slovak", ""),
+            ("sl", "Slovenian", ""),
+            ("es", "Spanish", ""),
+            ("sv", "Swedish", ""),
+            ("tr", "Turkish", ""),
+            ("uk", "Ukrainian", ""),
+        ),
+        default="auto",
+    )
+
+    translate_to: EnumProperty(
+        name="To",
+        description="Translate to",
+        items=(
+            # ("auto", "Any language (detect)", ""),
+            ("bg", "Bulgarian", ""),
+            ("zh", "Chinese", ""),
+            ("cs", "Czech", ""),
+            ("da", "Danish", ""),
+            ("nl", "Dutch", ""),
+            # ("en", "English", ""),  # Only usable for source language
+            ("en-US", "English (American)", ""),  # Only usable for destination language
+            ("en-GB", "English (British)", ""),  # Only usable for destination language
+            ("et", "Estonian", ""),
+            ("fi", "Finnish", ""),
+            ("fr", "French", ""),
+            ("de", "German", ""),
+            ("el", "Greek", ""),
+            ("hu", "Hungarian", ""),
+            ("id", "Indonesian", ""),
+            ("it", "Italian", ""),
+            ("ja", "Japanese", ""),
+            ("lv", "Latvian", ""),
+            ("lt", "Lithuanian", ""),
+            ("pl", "Polish", ""),
+            # ("pt", "Portuguese", ""),  # Only usable for source language
+            ("pt-PT", "Portuguese", ""),  # Only usable for destination language
+            (
+                "pt-BR",
+                "Portuguese (Brazilian)",
+                "",
+            ),  # Only usable for destination language
+            ("ro", "Romanian", ""),
+            ("ru", "Russian", ""),
+            ("sk", "Slovak", ""),
+            ("sl", "Slovenian", ""),
+            ("es", "Spanish", ""),
+            ("sv", "Swedish", ""),
+            ("tr", "Turkish", ""),
+            ("uk", "Ukrainian", ""),
+        ),
+        default="en-US",
+    )
+
     def execute(self, context):
-        
+        if self.do_translate:
+            print(self.translate_from)
+            try:
+                from srtranslator import SrtFile
+                from srtranslator.translators.deepl import DeeplTranslator
+            except ModuleNotFoundError:
+                import site
+                import subprocess
+                import sys
+
+                app_path = site.USER_SITE
+                if app_path not in sys.path:
+                    sys.path.append(app_path)
+                pybin = sys.executable  # bpy.app.binary_path_python # Use for 2.83
+
+                print("Ensuring: pip")
+                try:
+                    subprocess.call([pybin, "-m", "ensurepip"])
+                except ImportError:
+                    pass
+                self.report({"INFO"}, "Installing: srtranslator module.")
+                print("Installing: srtranslator module")
+                subprocess.check_call([pybin, "-m", "pip", "install", "srtranslator"])
+                try:
+                    from srtranslator import SrtFile
+                    from srtranslator.translators.deepl import DeeplTranslator
+
+                    self.report({"INFO"}, "Detected: srtranslator module.")
+                    print("Detected: srtranslator module")
+                except ModuleNotFoundError:
+                    print("Installation of the srtranslator module failed")
+                    self.report(
+                        {"INFO"},
+                        "Installing srtranslator module failed! Try to run Blender as administrator.",
+                    )
+                    return {"CANCELLED"}
+            file = self.filepath
+            if not file:
+                return {"CANCELLED"}
+                print("Invalid file")
+                self.report({"INFO"}, "Invalid file")
+            translator = DeeplTranslator()
+            if pathlib.Path(file).is_file():
+                print("Translating. Please Wait.")
+                self.report({"INFO"}, "Translating. Please Wait.")
+                srt = SrtFile(file)
+                srt.translate(translator, self.translate_from, self.translate_to)
+
+                # Making the result subtitles prettier
+                srt.wrap_lines()
+
+                srt.save(f"{os.path.splitext(file)[0]}_translated.srt")
+                translator.quit()
+                print("Translating finished.")
+                self.report({"INFO"}, "Translating finished.")
         try:
             import pysubs2
         except ModuleNotFoundError:
             import site
             import subprocess
             import sys
+
             app_path = site.USER_SITE
             if app_path not in sys.path:
                 sys.path.append(app_path)
@@ -53,16 +196,18 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
                 subprocess.call([pybin, "-m", "ensurepip"])
             except ImportError:
                 pass
-            self.report({'INFO'}, "Installing: pysubs2 module.")
+            self.report({"INFO"}, "Installing: pysubs2 module.")
             print("Installing: pysubs2 module")
             subprocess.check_call([pybin, "-m", "pip", "install", "pysubs2"])
             try:
                 import pysubs2
             except ModuleNotFoundError:
                 print("Installation of the pysubs2 module failed")
-                self.report({'INFO'}, "Installing pysubs2 module failed! Try to run Blender as administrator.")
+                self.report(
+                    {"INFO"},
+                    "Installing pysubs2 module failed! Try to run Blender as administrator.",
+                )
                 return {"CANCELLED"}
-        
         render = bpy.context.scene.render
         fps = render.fps / render.fps_base
         fps_conv = fps / 1000
@@ -77,6 +222,8 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             empty_channel = channels[-1] + 1
             addSceneChannel = empty_channel
         file = self.filepath
+        if self.do_translate:
+            file = f"{os.path.splitext(file)[0]}_translated.srt"
         if not file:
             return {"CANCELLED"}
         if pathlib.Path(file).is_file():
@@ -88,7 +235,7 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
                 self.report({"INFO"}, "Unable to extract subtitles from file")
                 return {"CANCELLED"}
         try:
-            subs = pysubs2.load(self.filepath, fps=fps, encoding="utf-8")
+            subs = pysubs2.load(file, fps=fps, encoding="utf-8")
         except:
             print("Import failed. Text encoding must be in UTF-8.")
             self.report({"INFO"}, "Import failed. Text encoding must be in UTF-8.")
@@ -153,6 +300,7 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
 
 class SEQUENCER_OT_copy_textprops_to_selected(Operator):
     """Copy properties from active text strip to selected text strips"""
+
     bl_idname = "sequencer.copy_textprops_to_selected"
     bl_label = "Copy Properties to Selected"
     bl_options = {"REGISTER", "UNDO"}
