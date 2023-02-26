@@ -13,7 +13,7 @@ Import:
 
 Translate:
 
-![translate](https://user-images.githubusercontent.com/1322593/221409402-14c6eb4c-0c5e-4bb1-abc8-82993e18520d.png)
+![translate](https://user-images.githubusercontent.com/1322593/221444525-a8c2f4b4-94f1-4f5e-bb83-67003d5eafb2.png)
 
 Copy to Selected:
 
