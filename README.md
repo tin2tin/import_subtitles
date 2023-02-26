@@ -9,11 +9,15 @@ And then install as any other Blender add-on.
 ## Usage
 Import:
 
-![alt text](https://pasteall.org/media/6/7/677b994d8bbc75a475d86db7697afb0f.gif)
+![import_subtitles](https://user-images.githubusercontent.com/1322593/221409262-6aa59c0a-7ee4-4c92-b677-39a0f5ee5a9d.gif)
+
+Translate:
+
+![translate](https://user-images.githubusercontent.com/1322593/221409402-14c6eb4c-0c5e-4bb1-abc8-82993e18520d.png)
 
 Copy to Selected:
 
-![alt text](https://pasteall.org/media/5/b/5bf0e161c8ab065111a9e9615ee376c7.gif)
+![copy_textprops_to_selected](https://user-images.githubusercontent.com/1322593/221409293-2c9f65ef-c386-456f-bb0a-c87c3eee01d2.gif)
 
 ## Supported Formats
 Srt, ssa, ass, mpl2, tmp, vtt, microdvd - supported by pysubs2
