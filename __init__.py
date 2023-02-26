@@ -8,11 +8,11 @@ import pathlib
 import re
 
 bl_info = {
-    "name": "Subtitle Import and Translation",
+    "name": "Subtitle Import & Translation",
     "author": "tintwotin",
-    "version": (0, 2, 0),
+    "version": (0, 1, 0),
     "blender": (3, 0, 0),
-    "description": "Import and translate subtitles",
+    "description": "Import, translate or bulk change subtitles",
     "location": "Sequence Editor > Strip Menu > Import Subtitles",
     "warning": "",
     "tracker_url": "",
@@ -21,7 +21,7 @@ bl_info = {
 
 
 class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
-    """Import subtitles"""
+    """Import & Translate Subtitles"""
 
     bl_idname = "sequencer.import_subtitles"
     bl_label = "Import Subtitles"
@@ -36,7 +36,7 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
     )
 
     do_translate: BoolProperty(
-        name="Translate Subtitle", description="Translate subtitle", default=False
+        name="Translate Subtitles", description="Translate subtitles", default=False, options={"HIDDEN"},
     )
 
     translate_from: EnumProperty(
@@ -77,6 +77,7 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             ("uk", "Ukrainian", ""),
         ),
         default="auto",
+        options={"HIDDEN"},
     )
 
     translate_to: EnumProperty(
@@ -121,7 +122,9 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             ("uk", "Ukrainian", ""),
         ),
         default="en-US",
+        options={"HIDDEN"},
     )
+
 
     def execute(self, context):
         if self.do_translate:
@@ -281,8 +284,8 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             )
             new_strip.text = line.text
             new_strip.wrap_width = 0.68
-            new_strip.font_size = 48
-            new_strip.location[1] = 0.2
+            new_strip.font_size = 44
+            new_strip.location[1] = 0.25
             new_strip.align_x = "CENTER"
             new_strip.align_y = "TOP"
             new_strip.use_shadow = True
@@ -296,6 +299,37 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
             if bold:
                 new_strip.use_bold = True
         return {"FINISHED"}
+
+    def draw(self, context):
+        pass
+
+
+class SEQUENCER_PT_import_subtitles(bpy.types.Panel):
+    bl_space_type = 'FILE_BROWSER'
+    bl_region_type = 'TOOL_PROPS'
+    bl_label = "Translate"
+    bl_parent_id = "FILE_PT_operator"
+
+    @classmethod
+    def poll(cls, context):
+        sfile = context.space_data
+        operator = sfile.active_operator
+        print(operator.bl_idname)
+        return operator.bl_idname == "SEQUENCER_OT_import_subtitles"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        sfile = context.space_data
+        operator = sfile.active_operator
+        layout = layout.column(heading="Subtitles")
+        layout.prop(operator, "do_translate", text="")
+        col = layout.column(align=False)
+        col.prop(operator, "translate_from", text="From")
+        col.prop(operator, "translate_to", text="To")
+        col.active = operator.do_translate
 
 
 class SEQUENCER_OT_copy_textprops_to_selected(Operator):
@@ -348,6 +382,7 @@ def copyto_panel_append(self, context):
 
 classes = (
     SEQUENCER_OT_import_subtitles,
+    SEQUENCER_PT_import_subtitles,
     SEQUENCER_OT_copy_textprops_to_selected,
 )
 
