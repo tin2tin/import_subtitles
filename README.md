@@ -33,3 +33,5 @@ Import Text Block as Text Strip: https://github.com/tin2tin/import_text_block_as
 Text to Strip: https://github.com/tin2tin/text_to_strip
 
 Text Strip to 3d Text Object: https://github.com/tin2tin/blender-addon-link-text-to-vse-subtitle
+
+Screenplay to Text Strips: https://github.com/tin2tin/Blender_Screenwriter
