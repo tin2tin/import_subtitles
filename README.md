@@ -35,3 +35,5 @@ Text to Strip: https://github.com/tin2tin/text_to_strip
 Text Strip to 3d Text Object: https://github.com/tin2tin/blender-addon-link-text-to-vse-subtitle
 
 Screenplay to Text Strips: https://github.com/tin2tin/Blender_Screenwriter
+
+Add Outline: https://gist.github.com/tin2tin/b8e7fb9156b5c5d54fdab5d808dc7c1f
