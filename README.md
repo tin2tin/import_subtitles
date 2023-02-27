@@ -37,3 +37,5 @@ Text Strip to 3d Text Object: https://github.com/tin2tin/blender-addon-link-text
 Screenplay to Text Strips: https://github.com/tin2tin/Blender_Screenwriter
 
 Add Outline: https://gist.github.com/tin2tin/b8e7fb9156b5c5d54fdab5d808dc7c1f
+
+Add Time Code as Text Strips: https://gist.github.com/tin2tin/1eabb233bce24e78d2edf35cb5a435c8
