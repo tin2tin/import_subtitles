@@ -24,3 +24,6 @@ Srt, ssa, ass, mpl2, tmp, vtt, microdvd - supported by pysubs2
 
 ## Supported languages
 Bulgarian, Chinese, Czech, Danish, Dutch, English(American/British), Estonian, Finnish, French, German, Greek, Hungarian, Indonesian, Italian, Japanese, Latvian, Lithuanian, Polish, Portuguese/Brazilian, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Turkish, Ukrainian - supported by SRTranslator.
+
+##
+Text strips to Speech: https://github.com/tin2tin/text_strip_to_speech
