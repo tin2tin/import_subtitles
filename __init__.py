@@ -24,7 +24,7 @@ class SEQUENCER_OT_import_subtitles(Operator, ImportHelper):
     """Import & Translate Subtitles"""
 
     bl_idname = "sequencer.import_subtitles"
-    bl_label = "Import Subtitles"
+    bl_label = "Import & Translate Subtitles"
     bl_options = {"REGISTER", "UNDO"}
 
     filename_ext = [".srt", ".ass"]
