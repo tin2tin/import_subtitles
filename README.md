@@ -1,5 +1,5 @@
 # Import and Translate Subtitles
-Add-on for importing and translating subtitles(srt, ssa, ass, mpl2, tmp, vtt, microdvd) in the Blender Video Sequence Editor using [pysubs2](https://github.com/tkarabela/pysubs2) & [SRTranslator](https://github.com/sinedie/SRTranslator) modules, and add 'Copy Text Properties to Selected' - operator. 
+Add-on for importing and translating subtitles in the Blender Video Sequence Editor using [pysubs2](https://github.com/tkarabela/pysubs2) & [SRTranslator](https://github.com/sinedie/SRTranslator) modules, and add 'Copy Text Properties to Selected' - operator. 
 
 ## Installation
 On windows right click on the Blender icon and start it by selecting "Run as Administrator"(or else can't the pysubs2 & SRTranslator be installed).
