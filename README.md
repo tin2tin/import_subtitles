@@ -27,6 +27,9 @@ Bulgarian, Chinese, Czech, Danish, Dutch, English(American/British), Estonian, F
 
 ## More Text Strip add-ons
 Text Strips to Speech: https://github.com/tin2tin/text_strip_to_speech
+
 Import Text Block as Text Strip: https://github.com/tin2tin/import_text_block_as_text_strip
+
 Text to Strip: https://github.com/tin2tin/text_to_strip
+
 Text Strip to 3d Text Object: https://github.com/tin2tin/blender-addon-link-text-to-vse-subtitle
